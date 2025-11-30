@@ -7,6 +7,13 @@
       <link rel="icon" type="image/svg+xml" href="./src/assest/image.png"  />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#dc2626" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Techno World" />
+    <link rel="apple-touch-icon" href="./image.png" />
+    <link rel="manifest" href="./manifest.json" />
     <title>Techno World</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   </head>
@@ -14,5 +21,60 @@
     <div id="root"></div>
     <div id="modal-root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // PWA Install Prompt Handler for Android
+      let deferredPrompt;
+
+      // Listen for the beforeinstallprompt event
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event for later use
+        deferredPrompt = e;
+        console.log('PWA install prompt available');
+        
+        // Show install button/notification if needed
+        // You can trigger this from your UI when user clicks install button
+        if (window.pwaInstallPrompt) {
+          window.pwaInstallPrompt(deferredPrompt);
+        }
+      });
+
+      // Handle app installed event
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed successfully');
+        deferredPrompt = null;
+      });
+
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .then((registration) => {
+              console.log('Service Worker registered successfully:', registration);
+            })
+            .catch((error) => {
+              console.error('Service Worker registration failed:', error);
+            });
+        });
+      } else {
+        console.warn('Service Workers are not supported in this browser');
+      }
+
+      // Make deferredPrompt accessible from React component
+      window.installApp = () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the install prompt');
+            } else {
+              console.log('User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+          });
+        }
+      };
+    </script>
   </body>
 </html>

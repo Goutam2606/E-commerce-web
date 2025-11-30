@@ -11,6 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import ROLE from "../common/role";
 import Context from "../context";
 import axios from "axios";
+import { useElectron } from "../hooks/useElectron";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const Header = () => {
   const [search, setSearch] = useState(searchInput?.search?.split("=")[1] || "");
   const [newLogo, setNewLogo] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { isElectron, minimizeWindow, closeWindow } = useElectron();
 
   // Get logo
   const getLogo = async () => {
@@ -77,6 +79,12 @@ const Header = () => {
 
   return (
     <header className='h-16 shadow-md bg-white fixed w-full z-40'>
+      {isElectron && (
+        <div className="bg-primary text-white px-2 py-1 flex justify-end gap-2">
+          <button onClick={minimizeWindow} className="hover:bg-red-700 px-2">−</button>
+          <button onClick={closeWindow} className="hover:bg-red-700 px-2">×</button>
+        </div>
+      )}
       <div className="h-full container mx-auto flex items-center px-4 justify-between">
         <div>
           <Link to={"/"}>

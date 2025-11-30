@@ -5,13 +5,27 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: 'dist', // Default output directory for Vite
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          redux: ['@reduxjs/toolkit', 'react-redux']
+        }
+      }
+    },
+    // Ensure service worker is not minified/chunked incorrectly
+    assetsDir: 'assets',
+    copyPublicDir: true,
   },
-  // this is add for hostin at local network
   server: {
     historyApiFallback: true,
-    host: '0.0.0.0', // This allows access from other devices on the local network
-    port: 5173, // You can choose any port
-},
-base: '/',
+    host: '0.0.0.0',
+    port: 5173,
+  },
+  base: './',
+  define: {
+    global: 'globalThis',
+  }
 })
